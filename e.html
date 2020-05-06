@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="author" content="Daniele Cordano">
+    <meta name="description" content="View your favourite golf courses from the satellite. Your virtual practice round."/>
+    <meta property="og:description" content="View your favourite golf courses from the satellite. Your virtual practice round." />
+    <meta property="og:image" content="http://www.golfmaps.info/img/golfmaps_256.png"/>
+    <link rel="shortcut icon" sizes="256x256" href="img/golfmaps_256.png">
+    <title>Golf Maps</title>
+    <style>
+html, body, #gmap {
+  width: 100%;
+  height: 90%;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+.first {
+  height: 5vh;
+}
+.rect {
+  width: 30vw;
+  font-size: 2vh;
+  text-align: left;
+  padding: 0;
+  margin: 1vh;
+  background: rgb(255, 255, 255);
+  color: rgb(0, 128, 0);
+}
+::selection {
+  background: rgb(0, 128, 0);
+  color:  rgb(255, 255, 255);
+}
+.butt {
+  width: 15vw;
+}
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+    <script type="text/javascript" src="lib/mousetrap.min.js"></script>
+    <script type="text/javascript" src="e.js"></script>
+	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4Wf6YgqgaqXtaHACUYyhlRNtMutMPHuk&callback=initMap" type="text/javascript"></script>
+  </head>
+  <body>
+    <input id="name" class="first rect" type="text" value="Course Name">
+    <input id="where" class="first rect" type="text" value="52.554450, -1.733640">
+    <input id="country" class="first rect" type="text" value="US">
+    <input id="hole" class="first rect" type="text" value="1" disabled>
+    <input id="distance" class="first rect" type="text" value="0" disabled><br>
+    <button type="button" class="butt" id="dragmap">Drag map</button>
+    <button type="button" class="butt" id="nexthole">Next hole</button>
+    <button type="button" class="butt" id="draghole">Drag hole</button>
+    <button type="button" class="butt" id="gotohole">Go to hole</button>
+    <button type="button" class="butt" id="set">Add course</button>
+    <div id="gmap"></div>
+  </body>
+</html>

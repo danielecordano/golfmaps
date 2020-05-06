@@ -1,0 +1,12 @@
+const ref = firebase.database().ref('courses/');
+let jsonList = "";
+ref.orderByChild('name')
+        .once('value', (snapshot) => {
+          snapshot.forEach(childSnapshot => {
+            const encName = childSnapshot.key;
+            let course = childSnapshot.val();
+            course.encodedName = encName;
+            jsonList += JSON.stringify(course) + '\n';
+          });
+          console.log(jsonList);
+        });

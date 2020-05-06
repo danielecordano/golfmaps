@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="author" content="Daniele Cordano">
+  <meta name="description"
+    content="View your favourite golf courses from the satellite. Your practice round on the web." />
+  <meta property="og:description"
+    content="View your favourite golf courses from the satellite. Your practice round on the web." />
+  <meta property="og:image" content="img/golfmaps_256.png" />
+  <link rel="shortcut icon" sizes="128x128" href="img/golfmaps_128.png">
+  <link rel="apple-touch-icon" sizes="128x128" href="img/golfmaps_128.png">
+  <title>Golf Maps</title>
+  <style>
+    :root {
+      --primary-color:rgb(238, 136, 34);
+      --secondary-color:rgb(255, 255, 255);
+    }
+    #hole,
+    #unit {
+      text-indent: 3vmax;
+      -webkit-appearance: none;
+    }
+
+    #weather {
+      width: 6vmax;
+      height: 6vmax;
+      cursor: pointer;
+    }
+
+    .arrows,
+    #hole,
+    #distance,
+    #unit {
+      width: 8vmax;
+      font-size: 3vmax;
+      text-align: center;
+      padding: 0;
+      border: 0;
+      margin: 0;
+      outline: none;
+      background: var(--secondary-color);
+      opacity: 1;
+      border-radius: 0;
+    }
+
+    #distance {
+      width: fit-content;
+      text-align: right;
+      padding-right: 2vmax;
+      padding-left: 2vmax;
+    }
+
+    .arrows:hover {
+      color: var(--secondary-color);
+      background: var(--primary-color);
+    }
+
+    #menuopener {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 8vmax;
+      height: 8vmax;
+      font-size: 6vmax;
+      color: var(--secondary-color);
+      background: var(--primary-color);
+      border: 0;
+      outline: none;
+      z-index: 2;
+    }
+
+    .menu {
+      position: absolute;
+      top: 8vmax;
+      left: 0;
+      width: 35vmax;
+      background: var(--primary-color);
+      border: 0;
+      z-index: 2;
+      max-height: calc(100% - 8vmax);
+      overflow-x: hidden;
+      overflow-y: auto;
+      white-space: nowrap;
+      transition: width .5s ease;
+    }
+
+    #menulist {
+      padding-left: 0;
+    }
+
+    #menulist>li {
+      list-style-type: none;
+      width: 100%;
+    }
+
+    #menulist>li>button {
+      width: 100%;
+      position: relative;
+      vertical-align: top;
+      height: 6vmax;
+      outline: none;
+      cursor: pointer;
+      font-size: 4vmax;
+      color: var(--secondary-color);
+      text-align: left;
+      background: var(--primary-color);
+      border: 0;
+    }
+
+    #menulist>li>button:hover {
+      background-color: var(--secondary-color);
+      color:var(--primary-color);
+    }
+
+    html,
+    body,
+    #gmap,
+    #scrim {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      margin: 0;
+    }
+
+    #scrim {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .collapse {
+      width: 0;
+    }
+  </style>
+  <script src="https://kit.fontawesome.com/32e51f45b8.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-database.js"></script>
+  <script src="lib/mousetrap.min.js"></script>
+  <script src="v2.js"></script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4Wf6YgqgaqXtaHACUYyhlRNtMutMPHuk&callback=initMap"
+    type="text/javascript"></script>
+</head>
+
+<body>
+  <div id="scrim" class="hide"></div>
+  <div id="gmap"></div>
+  <div id="distance"></div>
+  <select id="unit">
+    <option value="yd">yd</option>
+    <option value="mt">mt</option>
+  </select>
+  <button id="quickprev" class="arrows"><i class="fas fa-angle-up"></i></button>
+  <button id="quicknext" class="arrows"><i class="fas fa-angle-down"></i></button>
+  <select id="hole">
+    <option value="1" selected="selected">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+    <option value="16">16</option>
+    <option value="17">17</option>
+    <option value="18">18</option>
+  </select>
+  <button id="menuopener"><i class="fas fa-bars"></i></button>
+  <div id="menu" class="menu collapse">
+    <ul id="menulist">
+      <li><button id="next"><i class="fas fa-angle-right fa-fw"></i>Next hole</button></li>
+      <li><button id="prev"><i class="fas fa-angle-left fa-fw"></i>Previous hole</button></li>
+      <li><button id="autoplay"><i class="fas fa-play fa-fw"></i>Autoplay</button></li>
+      <li><button id="measure"><i class="fas fa-ruler fa-fw"></i>Measure</button></li>
+      <li><button id="weather"><i class="fas fa-sun fa-fw"></i>Weather</button></li>
+    </ul>
+  </div>
+</body>
+
+</html>
