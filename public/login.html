@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="author" content="Daniele Cordano" />
+    <meta
+      name="description"
+      content="View your favourite golf courses from the satellite. Your virtual practice round."
+    />
+    <meta
+      property="og:description"
+      content="View your favourite golf courses from the satellite. Your virtual practice round."
+    />
+    <meta property="og:image" content="img/golfmaps_256.png" />
+    <link rel="shortcut icon" sizes="256x256" href="img/golfmaps_256.png" />
+    <title>Golf Maps</title>
+    <style>
+      #user {
+        height: 8vh;
+        width: 8vh;
+        border-radius: 50%;
+        background: rgb(200, 200, 200);
+      }
+
+      .btn {
+        position: relative;
+        vertical-align: top;
+        height: 8vh;
+        cursor: pointer;
+        font-size: 4vh;
+        color: rgb(255, 255, 255);
+        background: rgb(0, 119, 255);
+        text-align: left;
+      }
+
+      .btn:hover {
+        color: rgb(200, 200, 200);
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="img/user.png" alt="User" id="user" />
+    <button type="button" id="login" class="btn hide">Login</button>
+    <button type="button" id="logout" class="btn hide">Logout</button>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="/__/firebase/7.15.4/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="/__/firebase/7.15.4/firebase-analytics.js"></script>
+    <script src="/__/firebase/7.15.4/firebase-auth.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script src="/__/firebase/init.js"></script>
+    <script>
+      let btnLogin;
+      let btnLogout;
+      let imgUser;
+      function login() {
+        btnLogin.classList.add("hide");
+        let provider = new firebase.auth.GoogleAuthProvider();
+        firebase.auth().signInWithRedirect(provider);
+      }
+      function logout() {
+        btnLogout.classList.add("hide");
+        firebase.auth().signOut();
+      }
+      function init() {
+        // Firebase analytics
+        firebase.analytics();
+
+        btnLogin = document.getElementById("login");
+        btnLogout = document.getElementById("logout");
+        imgUser = document.getElementById("user");
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            btnLogout.classList.remove("hide");
+            imgUser.src = user.photoURL;
+          } else {
+            btnLogin.classList.remove("hide");
+            imgUser.src = "img/user.png";
+          }
+        });
+        // controls
+        btnLogin.onclick = login;
+        btnLogout.onclick = logout;
+      }
+      window.onload = init;
+    </script>
+  </body>
+</html>

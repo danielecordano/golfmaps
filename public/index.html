@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="author" content="Daniele Cordano" />
+    <meta name="description" content="Golf courses maps" />
+    <meta property="og:description" content="Golf courses maps" />
+    <meta property="og:image" content="img/golfmaps_256.png" />
+    <link rel="shortcut icon" sizes="128x128" href="img/golfmaps_128.png" />
+    <link rel="apple-touch-icon" sizes="128x128" href="img/golfmaps_128.png" />
+    <title>Golf Maps</title>
+    <style>
+      ul {
+        list-style-type: none;
+        padding-left: 0;
+      }
+
+      ul > li > a {
+        font-family: sans-serif;
+        font-size: 4vmin;
+        color: rgb(238, 136, 34);
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      ul > li > a:hover {
+        color: rgb(0, 0, 0);
+      }
+
+      #twitter > a {
+        color: rgb(64, 153, 255);
+      }
+
+      #twitter > a:hover {
+        color: rgb(170, 204, 255);
+      }
+
+      #searchbox {
+        width: 80vmin;
+        height: 8vmin;
+        font-size: 4vmin;
+        padding: 0 4vmin 0 4vmin;
+        margin: 0;
+        outline: none;
+        border-radius: 4vmin;
+      }
+
+      #loader {
+        z-index: 1;
+        width: 8vmin;
+        height: 8vmin;
+        border: 1vmin solid rgb(255, 255, 255);
+        border-radius: 50%;
+        border-top: 1vmin solid rgb(238, 136, 34);
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .hide {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <ul id="sociallist">
+      <li id="twitter">
+        <a href="https://twitter.com/golfmapsinfo">Follow us!</a>
+      </li>
+    </ul>
+    <input id="searchbox" type="text" placeholder="Search course" />
+    <div id="loader" class="hide"></div>
+    <ul id="list"></ul>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="/__/firebase/7.15.4/firebase-app.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+           https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="/__/firebase/7.15.4/firebase-analytics.js"></script>
+    <script src="/__/firebase/7.15.4/firebase-auth.js"></script>
+    <script src="/__/firebase/7.15.4/firebase-database.js"></script>
+
+    <!-- Initialize Firebase -->
+    <script src="/__/firebase/init.js"></script>
+
+    <script>
+      function populate() {
+        const name = inputSearchbox.value;
+        if (name === "") return;
+        // Remove all children
+        while (ulList.firstChild) {
+          ulList.removeChild(ulList.firstChild);
+        }
+        // Show loader
+        divLoader.classList.remove("hide");
+        const queryText = name.charAt(0).toUpperCase() + name.slice(1);
+        inputSearchbox.value = queryText;
+        const ref = firebase.database().ref("courses/");
+        ref
+          .orderByChild("name")
+          .startAt(queryText)
+          .endAt(queryText + "\uf8ff")
+          .once("value", (snapshot) => {
+            // Remove loader
+            divLoader.classList.add("hide");
+            // Remove all children
+            while (ulList.firstChild) {
+              ulList.removeChild(ulList.firstChild);
+            }
+            // Add new children
+            snapshot.forEach((childSnapshot) => {
+              const encName = childSnapshot.key;
+              const name = childSnapshot.val().name;
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = "v.html?c=" + encName;
+              a.innerText = name;
+              li.appendChild(a);
+              ulList.appendChild(li);
+            });
+          });
+      }
+      // Firebase analytics
+      firebase.analytics();
+
+      const divLoader = document.getElementById("loader");
+      const ulList = document.getElementById("list");
+      const inputSearchbox = document.getElementById("searchbox");
+      inputSearchbox.oninput = populate;
+      populate();
+    </script>
+  </body>
+</html>
