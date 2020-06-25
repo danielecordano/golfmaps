@@ -1,2 +1,5 @@
 # Firebase cache
 .firebase/
+
+# Log files
+firebase-debug.log
